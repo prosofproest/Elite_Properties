@@ -40,8 +40,8 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="text-[10px] text-primary/50 font-bold uppercase tracking-widest mb-1">Call Us</p>
-                  <p className="font-bold text-primary text-lg">+91 88845 30510</p>
-                  <p className="text-xs text-primary/40">Mon - Sat, 9:00 AM - 7:00 PM</p>
+                  <p className="font-bold text-primary text-lg">Phone: +91 88845 30510</p>
+                  <p className="text-xs text-primary/40">WhatsApp: wa.me/918884530510</p>
                 </div>
               </div>
 
@@ -52,7 +52,6 @@ export default function ContactPage() {
                 <div>
                   <p className="text-[10px] text-primary/50 font-bold uppercase tracking-widest mb-1">Email Us</p>
                   <p className="font-bold text-primary text-lg">info@eliteproperties.in</p>
-                  <p className="text-xs text-primary/40">sales@eliteproperties.in</p>
                 </div>
               </div>
 

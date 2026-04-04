@@ -16,7 +16,7 @@ import { cn } from '../../lib/utils';
 const leadSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Invalid phone number'),
+  phone: z.string().min(10, 'Enter valid phone'),
   projectInterest: z.string().optional(),
   propertyType: z.string().optional(),
   budgetRange: z.string().optional(),
@@ -53,6 +53,9 @@ export default function LeadForm({ source, project, className }: LeadFormProps) 
       const refCode = localStorage.getItem('eliteRefCode') || null;
       const leadId = await createLead({
         ...data,
+        projectInterest: data.projectInterest || null,
+        propertyType: data.propertyType || null,
+        budgetRange: data.budgetRange || null,
         source,
         referralCode: refCode,
       });

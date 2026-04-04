@@ -77,7 +77,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="font-serif text-5xl md:text-7xl font-bold leading-tight mb-6"
+            className="font-serif text-3xl md:text-6xl font-bold leading-tight mb-6"
           >
             Where Dreams Find <br />
             <span className="text-accent italic">Their Address</span>

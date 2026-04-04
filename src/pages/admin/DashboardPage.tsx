@@ -64,80 +64,91 @@ const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Real-time stats and data
-    const leadsQuery = query(collection(db, 'leads'), orderBy('createdAt', 'desc'), limit(10));
-    const projectsQuery = query(collection(db, 'projects'));
-    const siteVisitsAllQuery = query(collection(db, 'siteVisits'));
-    
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    const visitsQuery = query(
-      collection(db, 'siteVisits'), 
-      where('visitDate', '==', todayStr),
-    );
+    let unsubLeads = () => {};
+    let unsubProjects = () => {};
+    let unsubSiteVisitsAll = () => {};
+    let unsubVisits = () => {};
+    let unsubTotalLeads = () => {};
 
-    const unsubLeads = onSnapshot(leadsQuery, (snapshot) => {
-      const leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead));
-      setRecentLeads(leads);
-      const todayLeadsCount = leads.filter(l => {
-        const date = l.createdAt?.toDate?.();
-        return date && isSameDay(date, new Date());
-      }).length;
-      setStats(prev => ({ ...prev, newLeadsToday: todayLeadsCount }));
-    }, (error) => {
-      console.error('Dashboard leads error:', error);
-    });
-
-    const unsubProjects = onSnapshot(projectsQuery, (snapshot) => {
-      setStats(prev => ({ ...prev, totalProjects: snapshot.size }));
-    }, (error) => {
-      console.error('Dashboard projects error:', error);
-    });
-
-    const unsubSiteVisitsAll = onSnapshot(siteVisitsAllQuery, (snapshot) => {
-      setStats(prev => ({ ...prev, totalSiteVisits: snapshot.size }));
-    }, (error) => {
-      console.error('Dashboard site visits error:', error);
-    });
-
-    const unsubVisits = onSnapshot(visitsQuery, (snapshot) => {
-      const visits = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SiteVisit));
-      setTodayVisits(visits);
-    }, (error) => {
-      console.error('Dashboard today visits error:', error);
-    });
-
-    const totalLeadsQuery = query(collection(db, 'leads'));
-    const unsubTotalLeads = onSnapshot(totalLeadsQuery, (snapshot) => {
-      setStats(prev => ({ ...prev, totalLeads: snapshot.size }));
+    try {
+      // Real-time stats and data
+      const leadsQuery = query(collection(db, 'leads'), orderBy('createdAt', 'desc'), limit(10));
+      const projectsQuery = query(collection(db, 'projects'));
+      const siteVisitsAllQuery = query(collection(db, 'siteVisits'));
       
-      // Prepare chart data (last 7 days)
-      const last7Days = Array.from({ length: 7 }, (_, i) => subDays(new Date(), 6 - i));
-      const dailyCounts = last7Days.map(day => {
-        return snapshot.docs.filter(doc => {
-          const createdAt = doc.data().createdAt?.toDate?.();
-          return createdAt && isSameDay(createdAt, day);
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
+      const visitsQuery = query(
+        collection(db, 'siteVisits'), 
+        where('visitDate', '==', todayStr),
+      );
+
+      unsubLeads = onSnapshot(leadsQuery, (snapshot) => {
+        const leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead));
+        setRecentLeads(leads);
+        const todayLeadsCount = leads.filter(l => {
+          const date = l.createdAt?.toDate?.();
+          return date && isSameDay(date, new Date());
         }).length;
+        setStats(prev => ({ ...prev, newLeadsToday: todayLeadsCount }));
+      }, (error) => {
+        console.error('Dashboard leads error:', error);
       });
 
-      setChartData({
-        labels: last7Days.map(day => format(day, 'EEE, MMM d')),
-        datasets: [
-          {
-            label: 'New Leads',
-            data: dailyCounts,
-            backgroundColor: '#C9A84C',
-            borderColor: '#C9A84C',
-            borderWidth: 0,
-            borderRadius: 4,
-            barThickness: 32,
-          },
-        ],
+      unsubProjects = onSnapshot(projectsQuery, (snapshot) => {
+        setStats(prev => ({ ...prev, totalProjects: snapshot.size }));
+      }, (error) => {
+        console.error('Dashboard projects error:', error);
       });
+
+      unsubSiteVisitsAll = onSnapshot(siteVisitsAllQuery, (snapshot) => {
+        setStats(prev => ({ ...prev, totalSiteVisits: snapshot.size }));
+      }, (error) => {
+        console.error('Dashboard site visits error:', error);
+      });
+
+      unsubVisits = onSnapshot(visitsQuery, (snapshot) => {
+        const visits = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SiteVisit));
+        setTodayVisits(visits);
+      }, (error) => {
+        console.error('Dashboard today visits error:', error);
+      });
+
+      const totalLeadsQuery = query(collection(db, 'leads'));
+      unsubTotalLeads = onSnapshot(totalLeadsQuery, (snapshot) => {
+        setStats(prev => ({ ...prev, totalLeads: snapshot.size }));
+        
+        // Prepare chart data (last 7 days)
+        const last7Days = Array.from({ length: 7 }, (_, i) => subDays(new Date(), 6 - i));
+        const dailyCounts = last7Days.map(day => {
+          return snapshot.docs.filter(doc => {
+            const createdAt = doc.data().createdAt?.toDate?.();
+            return createdAt && isSameDay(createdAt, day);
+          }).length;
+        });
+
+        setChartData({
+          labels: last7Days.map(day => format(day, 'EEE, MMM d')),
+          datasets: [
+            {
+              label: 'New Leads',
+              data: dailyCounts,
+              backgroundColor: '#C9A84C',
+              borderColor: '#C9A84C',
+              borderWidth: 0,
+              borderRadius: 4,
+              barThickness: 32,
+            },
+          ],
+        });
+        setLoading(false);
+      }, (error) => {
+        console.error('Dashboard total leads error:', error);
+        setLoading(false);
+      });
+    } catch (error) {
+      console.error('Dashboard configuration error:', error);
       setLoading(false);
-    }, (error) => {
-      console.error('Dashboard total leads error:', error);
-      setLoading(false);
-    });
+    }
 
     return () => {
       unsubLeads();

@@ -1,0 +1,16 @@
+d:/Hruthwick/Elite/src\components\home\About.tsx
+d:/Hruthwick/Elite/src\components\home\AboutSnippet.tsx
+d:/Hruthwick/Elite/src\components\home\FeaturedProjects.tsx
+d:/Hruthwick/Elite/src\components\home\GalleryPreview.tsx
+d:/Hruthwick/Elite/src\components\home\LatestBlogs.tsx
+d:/Hruthwick/Elite/src\components\projects\ProjectCard.tsx
+d:/Hruthwick/Elite/src\components\projects\ProjectGallery.tsx
+d:/Hruthwick/Elite/src\components\shared\ProjectCard.tsx
+d:/Hruthwick/Elite/src\pages\admin\AwardsPage.tsx
+d:/Hruthwick/Elite/src\pages\admin\BlogsPage.tsx
+d:/Hruthwick/Elite/src\pages\admin\GalleryPage.tsx
+d:/Hruthwick/Elite/src\pages\admin\ProjectsPage.tsx
+d:/Hruthwick/Elite/src\pages\public\AboutPage.tsx
+d:/Hruthwick/Elite/src\pages\public\GalleryPage.tsx
+d:/Hruthwick/Elite/src\pages\public\ProjectDetailsPage.tsx
+d:/Hruthwick/Elite/src\pages\public\SearchPage.tsx

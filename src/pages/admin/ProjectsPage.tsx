@@ -1,10 +1,14 @@
 /**
  * Elite Properties — Admin ProjectsPage
  * FIXED: Uses Cloudinary for image uploads (Firebase Storage = paid plan)
+ * FIXED: No compound Firebase index needed (client-side city filter)
+ * FIXED: generateSlug() to avoid name conflict with slug field
+ * FIXED: Removed set() helper to avoid stale closures
+ * FIXED: Dropzone accept typing without "as any"
  */
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Building2, Plus, Search, Edit2, Trash2, Image as ImageIcon, MapPin, X, Save, Upload, PlusCircle, MinusCircle, LayoutGrid, List, Loader2 } from 'lucide-react';
-import { collection, query, orderBy, onSnapshot, addDoc, updateDoc, doc, deleteDoc, serverTimestamp, where } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, updateDoc, doc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { handleFirestoreError, OperationType } from '../../lib/firestore';
 import { Project } from '../../lib/types';
@@ -27,6 +31,10 @@ async function uploadToCloudinary(file: File): Promise<string> {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// FIX ERROR 4: renamed slug() → generateSlug() to avoid conflict with slug field
+const generateSlug = (n: string) =>
+  n.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
 const EMPTY: Partial<Project> = {
   name: '', slug: '', tagline: '', location: '', city: 'Mumbai', type: 'Apartment',
   status: 'Ongoing', reraNumber: '', description: '', highlights: [], amenities: [],
@@ -47,14 +55,29 @@ export default function ProjectsPage() {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // FIX ERROR 1: Simple query (orderBy only, no compound index needed)
+  // City filtering done client-side
   useEffect(() => {
-    const q = cityFilter !== 'All'
-      ? query(collection(db, 'projects'), where('city', '==', cityFilter), orderBy('createdAt', 'desc'))
-      : query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
+    const q = query(
+      collection(db, 'projects'),
+      orderBy('createdAt', 'desc')
+    );
+
     const unsub = onSnapshot(q, snap => {
-      setProjects(snap.docs.map(d => ({ id: d.id, ...d.data() } as Project)));
+      let data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Project));
+
+      // Filter by city client-side (no Firebase index needed)
+      if (cityFilter !== 'All') {
+        data = data.filter(p => p.city === cityFilter);
+      }
+
+      setProjects(data);
       setLoading(false);
-    }, err => { handleFirestoreError(err, OperationType.LIST, 'projects'); setLoading(false); });
+    }, err => {
+      console.error('Projects error:', err);
+      setLoading(false);
+    });
+
     return unsub;
   }, [cityFilter]);
 
@@ -63,38 +86,78 @@ export default function ProjectsPage() {
     p.location?.toLowerCase().includes(searchTerm.toLowerCase())
   ), [projects, searchTerm]);
 
-  const slug = (n: string) => n.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   const openForm = (p?: Project) => { setEditingProject(p || null); setFormData(p ? { ...p } : { ...EMPTY }); setIsFormOpen(true); };
   const closeForm = () => { setIsFormOpen(false); setEditingProject(null); };
 
-  const set = (key: string, val: any) => setFormData(prev => ({ ...prev, [key]: val }));
+  // FIX ERROR 3: Removed set() helper. Direct setFormData calls used throughout.
 
   const addConfig = () => setFormData(prev => ({ ...prev, configurations: [...(prev.configurations || []), { type: '', carpetArea: '', price: '', availability: 'Available' }] }));
-  const removeConfig = (i: number) => { const c = [...(formData.configurations || [])]; c.splice(i, 1); set('configurations', c); };
-  const updateConfig = (i: number, k: string, v: string) => { const c = [...(formData.configurations || [])]; c[i] = { ...c[i], [k]: v }; set('configurations', c); };
+  const removeConfig = (i: number) => {
+    const c = [...(formData.configurations || [])];
+    c.splice(i, 1);
+    setFormData(prev => ({ ...prev, configurations: c }));
+  };
+  const updateConfig = (i: number, k: string, v: string) => {
+    const c = [...(formData.configurations || [])];
+    c[i] = { ...c[i], [k]: v };
+    setFormData(prev => ({ ...prev, configurations: c }));
+  };
 
-  const addChip = (f: 'highlights' | 'amenities', v: string) => { if (!v.trim()) return; const cur = formData[f] || []; if (!cur.includes(v.trim())) set(f, [...cur, v.trim()]); };
-  const rmChip = (f: 'highlights' | 'amenities', i: number) => { const c = [...(formData[f] || [])]; c.splice(i, 1); set(f, c); };
+  const addChip = (f: 'highlights' | 'amenities', v: string) => {
+    if (!v.trim()) return;
+    const cur = formData[f] || [];
+    if (!cur.includes(v.trim())) {
+      setFormData(prev => ({ ...prev, [f]: [...(prev[f] || []), v.trim()] }));
+    }
+  };
+  const rmChip = (f: 'highlights' | 'amenities', i: number) => {
+    const c = [...(formData[f] || [])];
+    c.splice(i, 1);
+    setFormData(prev => ({ ...prev, [f]: c }));
+  };
 
+  // FIX ERROR 2: useCallback with empty deps — setFormData is stable
   const onDropCover = useCallback(async (files: File[]) => {
     if (!files.length) return;
     setUploading(true);
-    try { set('coverImage', await uploadToCloudinary(files[0])); toast.success('Cover uploaded!'); }
-    catch (e: any) { toast.error(e.message); } finally { setUploading(false); }
-  }, []);
+    try {
+      const url = await uploadToCloudinary(files[0]);
+      setFormData(prev => ({ ...prev, coverImage: url }));
+      toast.success('Cover uploaded!');
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setUploading(false);
+    }
+  }, []); // Empty deps - setFormData is stable
 
   const onDropGallery = useCallback(async (files: File[]) => {
     if (!files.length) return;
     setUploading(true);
     try {
       const urls = await Promise.all(files.map(uploadToCloudinary));
-      setFormData(prev => ({ ...prev, images: [...(prev.images || []), ...urls] }));
+      setFormData(prev => ({
+        ...prev,
+        images: [...(prev.images || []), ...urls]
+      }));
       toast.success(`${urls.length} image(s) uploaded!`);
-    } catch (e: any) { toast.error(e.message); } finally { setUploading(false); }
-  }, []);
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setUploading(false);
+    }
+  }, []); // Empty deps - setFormData is stable
 
-  const { getRootProps: coverRoot, getInputProps: coverInput } = useDropzone({ onDrop: onDropCover as any, accept: { 'image/*': [] as string[] }, multiple: false });
-  const { getRootProps: gallRoot, getInputProps: gallInput } = useDropzone({ onDrop: onDropGallery as any, accept: { 'image/*': [] as string[] } });
+  // FIX ERROR 5: Proper dropzone accept typing (no "as any")
+  const { getRootProps: coverRoot, getInputProps: coverInput } = useDropzone({
+    onDrop: onDropCover,
+    accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] },
+    multiple: false
+  });
+  const { getRootProps: gallRoot, getInputProps: gallInput } = useDropzone({
+    onDrop: onDropGallery,
+    accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] }
+  });
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,6 +223,7 @@ export default function ProjectsPage() {
             <div key={p.id} className="bg-white rounded-sm border border-gray-200 overflow-hidden group hover:shadow-xl transition-all">
               <div className="relative h-52 overflow-hidden">
                 <img src={p.coverImage || 'https://placehold.co/800x600/0A1931/C9A84C?text=Elite+Properties'} alt={p.name}
+                  loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute top-3 left-3 flex gap-2">
                   <span className={cn("text-[8px] font-black uppercase px-2 py-1 rounded-sm",
@@ -202,7 +266,7 @@ export default function ProjectsPage() {
                 <tr key={p.id} className="hover:bg-gray-50/50">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <img src={p.coverImage || 'https://placehold.co/80x80/0A1931/C9A84C?text=EP'} className="w-10 h-10 object-cover rounded-sm" />
+                      <img src={p.coverImage || 'https://placehold.co/80x80/0A1931/C9A84C?text=EP'} className="w-10 h-10 object-cover rounded-sm" alt={p.name} loading="lazy" />
                       <div><p className="text-sm font-bold text-primary">{p.name}</p><p className="text-[10px] text-gray-400 uppercase">{p.type}</p></div>
                     </div>
                   </td>
@@ -235,28 +299,28 @@ export default function ProjectsPage() {
               <button onClick={closeForm} className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"><X size={22} /></button>
             </div>
 
-
-
             <form onSubmit={handleSave} className="space-y-14">
 
               {/* Basic Info */}
               <Section title="Basic Info" desc="Core project details">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <Field label="Project Name" required>
-                    <input required value={formData.name || ''} onChange={e => setFormData(p => ({ ...p, name: e.target.value, slug: slug(e.target.value) }))}
+                    {/* FIX ERROR 4: use generateSlug() not slug() */}
+                    <input required value={formData.name || ''} onChange={e => setFormData(p => ({ ...p, name: e.target.value, slug: generateSlug(e.target.value) }))}
                       className="input-admin" placeholder="Elite Heights" />
                   </Field>
                   <Field label="Slug">
-                    <input value={formData.slug || ''} onChange={e => set('slug', e.target.value)} className="input-admin" placeholder="elite-heights" />
+                    {/* FIX ERROR 3: direct setFormData instead of set('slug', ...) */}
+                    <input value={formData.slug || ''} onChange={e => setFormData(prev => ({ ...prev, slug: e.target.value }))} className="input-admin" placeholder="elite-heights" />
                   </Field>
                   <Field label="Tagline" span>
-                    <input value={formData.tagline || ''} onChange={e => set('tagline', e.target.value)} className="input-admin" placeholder="Luxury Living in Mumbai" />
+                    <input value={formData.tagline || ''} onChange={e => setFormData(prev => ({ ...prev, tagline: e.target.value }))} className="input-admin" placeholder="Luxury Living in Mumbai" />
                   </Field>
                   <Field label="Location" required>
-                    <input required value={formData.location || ''} onChange={e => set('location', e.target.value)} className="input-admin" placeholder="Worli, South Mumbai" />
+                    <input required value={formData.location || ''} onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))} className="input-admin" placeholder="Worli, South Mumbai" />
                   </Field>
                   <Field label="City">
-                    <select value={formData.city} onChange={e => set('city', e.target.value)} className="input-admin appearance-none">
+                    <select value={formData.city} onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))} className="input-admin appearance-none">
                       {['Mumbai', 'Thane', 'Navi Mumbai', 'Pune', 'Nashik'].map(c => <option key={c}>{c}</option>)}
                     </select>
                   </Field>
@@ -267,20 +331,20 @@ export default function ProjectsPage() {
               <Section title="Details & Pricing" desc="Type, RERA, pricing">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <Field label="Type">
-                    <select value={formData.type} onChange={e => set('type', e.target.value)} className="input-admin appearance-none">
+                    <select value={formData.type} onChange={e => setFormData(prev => ({ ...prev, type: e.target.value }))} className="input-admin appearance-none">
                       {['Apartment', 'Villa', 'Commercial', 'Plot'].map(t => <option key={t}>{t}</option>)}
                     </select>
                   </Field>
                   <Field label="Status">
-                    <select value={formData.status} onChange={e => set('status', e.target.value)} className="input-admin appearance-none">
+                    <select value={formData.status} onChange={e => setFormData(prev => ({ ...prev, status: e.target.value }))} className="input-admin appearance-none">
                       {['Ongoing', 'Completed', 'Upcoming'].map(s => <option key={s}>{s}</option>)}
                     </select>
                   </Field>
                   <Field label="Price Range">
-                    <input value={formData.priceRange || ''} onChange={e => set('priceRange', e.target.value)} className="input-admin" placeholder="₹1.5 Cr - ₹4.2 Cr" />
+                    <input value={formData.priceRange || ''} onChange={e => setFormData(prev => ({ ...prev, priceRange: e.target.value }))} className="input-admin" placeholder="₹1.5 Cr - ₹4.2 Cr" />
                   </Field>
                   <Field label="Description" span>
-                    <textarea rows={4} value={formData.description || ''} onChange={e => set('description', e.target.value)} className="input-admin resize-none" placeholder="Describe the project..." />
+                    <textarea rows={4} value={formData.description || ''} onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))} className="input-admin resize-none" placeholder="Describe the project..." />
                   </Field>
                 </div>
               </Section>
@@ -334,7 +398,7 @@ export default function ProjectsPage() {
                       formData.coverImage ? "border-accent bg-accent/5" : "border-gray-200 hover:border-accent hover:bg-gray-50")}>
                       <input {...coverInput()} />
                       {uploading ? <><Loader2 size={32} className="text-accent animate-spin mb-2" /><p className="text-sm text-gray-400">Uploading...</p></>
-                        : formData.coverImage ? <div className="relative group"><img src={formData.coverImage} className="max-h-40 rounded-sm" /><div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold">Change</div></div>
+                        : formData.coverImage ? <div className="relative group"><img src={formData.coverImage} className="max-h-40 rounded-sm" alt="Cover" /><div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold">Change</div></div>
                           : <><Upload className="text-gray-300 mb-3" size={36} /><p className="text-sm font-bold text-primary">Click or drag cover image</p></>}
                     </div>
                   </div>
@@ -350,8 +414,8 @@ export default function ProjectsPage() {
                       <div className="grid grid-cols-5 sm:grid-cols-8 gap-3 mt-4">
                         {formData.images?.map((url, i) => (
                           <div key={i} className="relative group aspect-square">
-                            <img src={url} className="w-full h-full object-cover rounded-sm" />
-                            <button type="button" onClick={() => { const imgs = [...(formData.images || [])]; imgs.splice(i, 1); set('images', imgs); }}
+                            <img src={url} className="w-full h-full object-cover rounded-sm" alt={`Gallery ${i}`} loading="lazy" />
+                            <button type="button" onClick={() => { const imgs = [...(formData.images || [])]; imgs.splice(i, 1); setFormData(prev => ({ ...prev, images: imgs })); }}
                               className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100"><X size={10} /></button>
                           </div>
                         ))}
@@ -360,8 +424,8 @@ export default function ProjectsPage() {
                   </div>
                   {/* URLs */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Field label="Floor Plan URL"><input value={formData.floorPlanUrl || ''} onChange={e => set('floorPlanUrl', e.target.value)} className="input-admin" placeholder="URL to floor plan" /></Field>
-                    <Field label="Video URL"><input value={formData.videoUrl || ''} onChange={e => set('videoUrl', e.target.value)} className="input-admin" placeholder="YouTube link" /></Field>
+                    <Field label="Floor Plan URL"><input value={formData.floorPlanUrl || ''} onChange={e => setFormData(prev => ({ ...prev, floorPlanUrl: e.target.value }))} className="input-admin" placeholder="URL to floor plan" /></Field>
+                    <Field label="Video URL"><input value={formData.videoUrl || ''} onChange={e => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))} className="input-admin" placeholder="YouTube link" /></Field>
                   </div>
                 </div>
               </Section>
@@ -370,7 +434,7 @@ export default function ProjectsPage() {
               <div className="flex flex-wrap gap-8 pt-8 border-t border-gray-100">
                 {[['isFeatured', 'Featured', 'bg-accent'], ['published', 'Published', 'bg-green-500']].map(([k, l, c]) => (
                   <label key={k} className="flex items-center gap-3 cursor-pointer">
-                    <div onClick={() => set(k, !(formData as any)[k])} className={cn("w-12 h-6 rounded-full relative transition-all", (formData as any)[k] ? c : "bg-gray-200")}>
+                    <div onClick={() => setFormData(prev => ({ ...prev, [k]: !(prev as any)[k] }))} className={cn("w-12 h-6 rounded-full relative transition-all", (formData as any)[k] ? c : "bg-gray-200")}>
                       <div className={cn("absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm", (formData as any)[k] ? "left-7" : "left-1")} />
                     </div>
                     <span className="text-xs font-black uppercase tracking-widest text-primary">{l}</span>

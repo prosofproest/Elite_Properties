@@ -8,12 +8,12 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss()],
     define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-      'process.env.RESEND_API_KEY': JSON.stringify(env.RESEND_API_KEY),
-      'process.env.CLOUDINARY_API_KEY': JSON.stringify(env.CLOUDINARY_API_KEY),
-      'process.env.CLOUDINARY_API_SECRET': JSON.stringify(env.CLOUDINARY_API_SECRET),
-      'process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME': JSON.stringify(env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME),
-      'process.env.APP_URL': JSON.stringify(env.APP_URL),
+      'process.env.GEMINI_API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY),
+      'process.env.RESEND_API_KEY': JSON.stringify(env.VITE_RESEND_API_KEY),
+      'process.env.CLOUDINARY_API_KEY': JSON.stringify(env.VITE_CLOUDINARY_API_KEY),
+      'process.env.CLOUDINARY_API_SECRET': JSON.stringify(env.VITE_CLOUDINARY_API_SECRET),
+      'process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME': JSON.stringify(env.VITE_CLOUDINARY_CLOUD_NAME),
+      'process.env.APP_URL': JSON.stringify(env.VITE_APP_URL),
     },
     resolve: {
       alias: { '@': path.resolve(__dirname, '.') },

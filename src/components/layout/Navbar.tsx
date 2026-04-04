@@ -27,15 +27,7 @@ export default function Navbar() {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Search', path: '/search' },
-    { 
-      name: 'Projects', 
-      path: '/projects',
-      dropdown: [
-        { name: 'Ongoing Projects', path: '/projects?status=ongoing' },
-        { name: 'Delivered Projects', path: '/projects?status=delivered' },
-        { name: 'All Projects', path: '/projects' },
-      ]
-    },
+    { name: 'Projects', path: '/projects' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Loans', path: '/loan-calculator' },
     { name: 'Contact', path: '/contact' },
@@ -66,8 +58,6 @@ export default function Navbar() {
             <div 
               key={link.name} 
               className="relative group"
-              onMouseEnter={() => link.dropdown && setShowProjectsDropdown(true)}
-              onMouseLeave={() => link.dropdown && setShowProjectsDropdown(false)}
             >
               <Link
                 to={link.path}
@@ -79,32 +69,7 @@ export default function Navbar() {
                 )}
               >
                 {link.name}
-                {link.dropdown && <ChevronDown size={12} className={cn("transition-transform", showProjectsDropdown && "rotate-180")} />}
               </Link>
-
-              {/* Dropdown */}
-              {link.dropdown && (
-                <AnimatePresence>
-                  {showProjectsDropdown && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-0 mt-2 w-56 bg-white shadow-2xl rounded-sm overflow-hidden py-2 border-t-2 border-accent"
-                    >
-                      {link.dropdown.map((sub) => (
-                        <Link
-                          key={sub.name}
-                          to={sub.path}
-                          className="block px-6 py-3 text-[10px] uppercase tracking-widest font-bold text-primary hover:bg-gray-50 hover:text-accent transition-colors"
-                        >
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              )}
             </div>
           ))}
         </div>
@@ -161,7 +126,7 @@ export default function Navbar() {
                 <div key={link.name} className="flex flex-col gap-4">
                   <Link
                     to={link.path}
-                    onClick={() => !link.dropdown && setIsOpen(false)}
+                    onClick={() => setIsOpen(false)}
                     className={cn(
                       'text-3xl font-serif font-bold transition-colors',
                       location.pathname === link.path ? 'text-accent' : 'text-white'
@@ -169,20 +134,6 @@ export default function Navbar() {
                   >
                     {link.name}
                   </Link>
-                  {link.dropdown && (
-                    <div className="flex flex-col gap-4 pl-6 border-l border-accent/30">
-                      {link.dropdown.map((sub) => (
-                        <Link
-                          key={sub.name}
-                          to={sub.path}
-                          onClick={() => setIsOpen(false)}
-                          className="text-lg text-white/60 hover:text-accent transition-colors"
-                        >
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
