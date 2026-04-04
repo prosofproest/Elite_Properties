@@ -27,15 +27,30 @@ import {
   deleteDoc, 
   serverTimestamp 
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, getStorage } from 'firebase/storage';
-import app, { db } from '../../lib/firebase';
+import { db } from '../../lib/firebase';
 import { handleFirestoreError, OperationType } from '../../lib/firestore';
-
-const storage = getStorage(app);
 import { Award } from '../../lib/types';
 import { cn } from '../../lib/utils';
 import { toast } from 'sonner';
-import { useDropzone, DropzoneOptions } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
+
+// ─── Cloudinary Upload ────────────────────────────────────────────────────────
+const CLOUD_NAME = 'dzynvkgqd';
+const UPLOAD_PRESET = 'elite_properties';
+
+async function uploadToCloudinary(file: File): Promise<string> {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', UPLOAD_PRESET);
+  fd.append('folder', 'elite-properties/awards');
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+    { method: 'POST', body: fd }
+  );
+  if (!res.ok) throw new Error('Upload failed');
+  return (await res.json()).secure_url;
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 const AwardsPage: React.FC = () => {
   const [items, setItems] = useState<Award[]>([]);
@@ -86,26 +101,21 @@ const AwardsPage: React.FC = () => {
     if (acceptedFiles.length === 0) return;
     setUploading(true);
     try {
-      const file = acceptedFiles[0];
-      const storageRef = ref(storage, `awards/${Date.now()}_${file.name}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
+      const url = await uploadToCloudinary(acceptedFiles[0]);
       setFormData(prev => ({ ...prev, image: url }));
       toast.success('Award image uploaded');
-    } catch (error) {
-      toast.error('Upload failed');
+    } catch (error: any) {
+      toast.error('Upload failed: ' + error.message);
     } finally {
       setUploading(false);
     }
   };
 
-  const dropzoneOptions: any = {
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: { 'image/*': ['.jpeg', '.jpg', '.png', '.webp'] },
-    multiple: false
-  };
-
-  const { getRootProps, getInputProps } = useDropzone(dropzoneOptions);
+    multiple: false,
+  });
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -36,18 +36,33 @@ import {
   serverTimestamp,
   where
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, getStorage } from 'firebase/storage';
-import app, { db, auth } from '../../lib/firebase';
+import { db, auth } from '../../lib/firebase';
 import { handleFirestoreError, OperationType } from '../../lib/firestore';
-
-const storage = getStorage(app);
 import { Blog } from '../../lib/types';
 import { cn } from '../../lib/utils';
 import { toast } from 'sonner';
-import { useDropzone, DropzoneOptions } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { format } from 'date-fns';
+
+// ─── Cloudinary Upload ────────────────────────────────────────────────────────
+const CLOUD_NAME = 'dzynvkgqd';
+const UPLOAD_PRESET = 'elite_properties';
+
+async function uploadToCloudinary(file: File): Promise<string> {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', UPLOAD_PRESET);
+  fd.append('folder', 'elite-properties/blogs');
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+    { method: 'POST', body: fd }
+  );
+  if (!res.ok) throw new Error('Upload failed');
+  return (await res.json()).secure_url;
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 const BlogsPage: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -142,26 +157,22 @@ const BlogsPage: React.FC = () => {
     if (acceptedFiles.length === 0) return;
     setUploading(true);
     try {
-      const file = acceptedFiles[0];
-      const storageRef = ref(storage, `blogs/${Date.now()}_${file.name}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
+      const url = await uploadToCloudinary(acceptedFiles[0]);
       setFormData(prev => ({ ...prev, coverImage: url }));
       toast.success('Cover image uploaded');
-    } catch (error) {
-      toast.error('Upload failed');
+    } catch (error: any) {
+      toast.error('Upload failed: ' + error.message);
     } finally {
       setUploading(false);
     }
   };
 
-  const dropzoneOptions: any = {
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop: onDropCover,
     accept: { 'image/*': ['.jpeg', '.jpg', '.png', '.webp'] },
-    multiple: false
-  };
-
-  const { getRootProps, getInputProps } = useDropzone(dropzoneOptions);
+    multiple: false,
+    disabled: uploading,
+  });
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,8 +287,9 @@ const BlogsPage: React.FC = () => {
             <div key={blog.id} className="bg-white rounded-sm border border-gray-200 shadow-sm overflow-hidden group hover:shadow-xl transition-all duration-500 flex flex-col">
               <div className="relative h-48 overflow-hidden">
                 <img 
-                  src={blog.coverImage || 'https://picsum.photos/seed/blog/800/600'} 
+                  src={blog.coverImage || 'https://placehold.co/800x600/0A1931/C9A84C?text=Elite+Properties'} 
                   alt={blog.title}
+                  loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute top-4 left-4">
