@@ -1,0 +1,175 @@
+{
+  "entities": {
+    "projects": {
+      "title": "Project",
+      "description": "A real estate project by Elite Properties",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Project name" },
+        "slug": { "type": "string", "description": "URL slug" },
+        "tagline": { "type": "string" },
+        "location": { "type": "string", "description": "Area in Mumbai" },
+        "city": { "type": "string", "description": "City name" },
+        "state": { "type": "string" },
+        "pincode": { "type": "string" },
+        "status": { "type": "string", "enum": ["ongoing", "delivered", "upcoming"] },
+        "type": { "type": "string", "enum": ["residential", "villa", "commercial", "plot", "mixed"] },
+        "reraNumber": { "type": "string" },
+        "description": { "type": "string" },
+        "highlights": { "type": "array", "items": { "type": "string" } },
+        "configurations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "carpetArea": { "type": "string" },
+              "price": { "type": "string" }
+            }
+          }
+        },
+        "amenities": { "type": "array", "items": { "type": "string" } },
+        "coverImage": { "type": "string" },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "floorPlanUrl": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "mapEmbed": { "type": "string" },
+        "isFeatured": { "type": "boolean" },
+        "priceRange": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "slug", "location", "city", "status", "type", "coverImage", "priceRange"]
+    },
+    "leads": {
+      "title": "Lead",
+      "description": "A customer enquiry",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "message": { "type": "string" },
+        "projectInterest": { "type": "string" },
+        "status": { "type": "string", "enum": ["New", "Contacted", "Qualified", "Closed", "Lost"] },
+        "source": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "phone", "message", "status"]
+    },
+    "testimonials": {
+      "title": "Testimonial",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "content": { "type": "string" },
+        "rating": { "type": "number" },
+        "avatar": { "type": "string" }
+      },
+      "required": ["name", "content"]
+    },
+    "awards": {
+      "title": "Award",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "year": { "type": "string" },
+        "organization": { "type": "string" },
+        "image": { "type": "string" }
+      },
+      "required": ["title", "year"]
+    },
+    "gallery": {
+      "title": "Gallery Item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "category": { "type": "string" },
+        "projectId": { "type": "string" }
+      },
+      "required": ["imageUrl"]
+    },
+    "blogs": {
+      "title": "Blog Post",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "content": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "coverImage": { "type": "string" },
+        "author": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "slug", "content"]
+    },
+    "siteVisits": {
+      "title": "Site Visit Request",
+      "description": "A scheduled site visit by a potential customer",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "projectId": { "type": "string" },
+        "projectName": { "type": "string" },
+        "visitDate": { "type": "string", "format": "date" },
+        "timeSlot": { "type": "string" },
+        "peopleCount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Pending", "Confirmed", "Completed", "Cancelled"] },
+        "referenceNumber": { "type": "string" },
+        "source": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "phone", "email", "projectId", "projectName", "visitDate", "timeSlot", "peopleCount", "status", "referenceNumber"]
+    },
+    "blockedDates": {
+      "title": "Blocked Date",
+      "description": "Dates when site visits are not allowed",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date", "description": "YYYY-MM-DD" },
+        "reason": { "type": "string" }
+      },
+      "required": ["date"]
+    },
+    "channelPartners": {
+      "title": "Channel Partner",
+      "type": "object",
+      "properties": {
+        "firmName": { "type": "string" },
+        "contactPerson": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "reraNumber": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Approved", "Rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["firmName", "contactPerson", "email", "phone"]
+    },
+    "siteSettings": {
+      "title": "Site Setting",
+      "type": "object",
+      "properties": {
+        "value": { "type": "any" },
+        "description": { "type": "string" }
+      },
+      "required": ["value"]
+    }
+  },
+  "firestore": {
+    "/projects": { "schema": "projects", "description": "Collection of real estate projects" },
+    "/leads": { "schema": "leads", "description": "Collection of customer leads" },
+    "/testimonials": { "schema": "testimonials", "description": "Customer testimonials" },
+    "/awards": { "schema": "awards", "description": "Company awards" },
+    "/gallery": { "schema": "gallery", "description": "Visual gallery" },
+    "/blogs": { "schema": "blogs", "description": "Blog posts" },
+    "/siteVisits": { "schema": "siteVisits", "description": "Site visit requests" },
+    "/blockedDates": { "schema": "blockedDates", "description": "Blocked dates for site visits" },
+    "/channelPartners": { "schema": "channelPartners", "description": "Channel partner registrations" },
+    "/siteSettings": { "schema": "siteSettings", "description": "Global site settings" }
+  }
+}

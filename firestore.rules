@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /projects/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /leads/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /siteVisits/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /channelPartners/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /chatLogs/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /unsubscribes/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /gallery/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /testimonials/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /awards/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /blogs/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /siteSettings/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /blockedDates/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /emailLogs/{id} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /referralLeads/{id} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
