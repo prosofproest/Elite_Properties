@@ -8,7 +8,7 @@ import { Phone } from 'lucide-react';
 export default function CallButton() {
   return (
     <a
-      href="tel:+918884530510"
+      href="tel:+917304954717"
       className="fixed bottom-6 left-6 z-50 bg-[#007AFF] text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform active:scale-95 flex items-center justify-center md:hidden group"
       aria-label="Call Us"
     >

@@ -55,7 +55,7 @@ const ProjectEnquiryForm: React.FC<ProjectEnquiryFormProps> = ({ projectName, cl
         </p>
         <div className="bg-gray-50 p-4 rounded-sm border border-gray-100">
           <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-1">Direct Helpline</p>
-          <p className="text-primary font-black text-lg">+91 88845 30510</p>
+          <p className="text-primary font-black text-lg">+91 73049 54717</p>
         </div>
         <button 
           onClick={() => setIsSuccess(false)}
@@ -116,7 +116,7 @@ const ProjectEnquiryForm: React.FC<ProjectEnquiryFormProps> = ({ projectName, cl
 
       <div className="mt-8 pt-8 border-t border-gray-50 flex flex-col gap-4">
         <a
-          href="tel:+918884530510"
+          href="tel:+917304954717"
           className="flex items-center gap-4 text-primary hover:text-accent transition-colors group"
         >
           <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center group-hover:bg-accent/10 transition-colors">
@@ -124,11 +124,11 @@ const ProjectEnquiryForm: React.FC<ProjectEnquiryFormProps> = ({ projectName, cl
           </div>
           <div>
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Call Us</p>
-            <p className="font-black text-sm">+91 88845 30510</p>
+            <p className="font-black text-sm">+91 73049 54717</p>
           </div>
         </a>
         <a
-          href={`https://wa.me/918884530510?text=${encodeURIComponent(`Hi, I'm interested in ${projectName}`)}`}
+          href={`https://wa.me/917304954717?text=${encodeURIComponent(`Hi, I'm interested in ${projectName}`)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-4 text-primary hover:text-green-600 transition-colors group"

@@ -23,15 +23,15 @@ a premium developer in Mumbai, India.
 Company Details:
 - Name: Elite Properties
 - City: Mumbai, Maharashtra, India
-- Phone: +918884530510
-- WhatsApp: +918884530510
+- Phone: +917304954717
+- WhatsApp: +917304954717
 - Property Types: Residential, Villas, Plots, Commercial
 - Cities: Mumbai, Thane, Navi Mumbai, Pune, Nashik
 - All projects RERA registered under MahaRERA
 
 Your Rules:
 1. Help users find properties by budget, BHK, location
-2. For exact pricing always say call +918884530510
+2. For exact pricing always say call +917304954717
 3. Calculate rough EMI when asked:
    Formula: P*r*(1+r)^n/((1+r)^n-1)
    Default: 8.75% rate, 20 year tenure
@@ -40,7 +40,7 @@ Your Rules:
    (Hindi/English/Hinglish all supported)
 6. Keep replies short: max 3-4 lines per message
 7. If user says call or agent:
-   show: Call us: +918884530510
+   show: Call us: +917304954717
 8. If user seems ready to buy:
    suggest booking a site visit
 9. Never discuss competitor developers
@@ -117,10 +117,10 @@ export default function ChatBot() {
       return "Opening the site visit booking form for you...";
     }
     if (lowerText.includes('call')) {
-      return "You can call our expert at +918884530510 for immediate assistance.";
+      return "You can call our expert at +917304954717 for immediate assistance.";
     }
     if (lowerText.includes('whatsapp')) {
-      window.open('https://wa.me/918884530510', '_blank');
+      window.open('https://wa.me/917304954717', '_blank');
       return "Opening WhatsApp to chat with our agent...";
     }
     const emiMatch = text.match(/emi\s+(\d+)/i);
@@ -183,7 +183,7 @@ export default function ChatBot() {
       });
 
       const data = await response.json();
-      const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I apologize, but I'm having trouble connecting. Please call us at +918884530510.";
+      const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I apologize, but I'm having trouble connecting. Please call us at +917304954717.";
 
       const botMessage: Message = {
         role: 'model',
@@ -198,7 +198,7 @@ export default function ChatBot() {
       console.error('ChatBot Error:', error);
       const errorMessage: Message = {
         role: 'model',
-        parts: [{ text: "Sorry, I encountered an error. Please call us at +918884530510 for assistance." }],
+        parts: [{ text: "Sorry, I encountered an error. Please call us at +917304954717 for assistance." }],
         timestamp: Date.now()
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -292,7 +292,7 @@ export default function ChatBot() {
 
               {isRateLimited && (
                 <div className="bg-red-50 text-red-600 p-3 rounded-xl text-[10px] font-bold text-center border border-red-100">
-                  Please call us at +91 88845 30510 for more help!
+                  Please call us at +91 73049 54717 for more help!
                 </div>
               )}
             </div>

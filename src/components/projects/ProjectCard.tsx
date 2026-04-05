@@ -16,7 +16,7 @@ interface ProjectCardProps {
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   const whatsappMessage = `Hi, I'm interested in ${project.name} in ${project.location}. Please share more details.`;
-  const whatsappUrl = `https://wa.me/918884530510?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappUrl = `https://wa.me/917304954717?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <motion.div

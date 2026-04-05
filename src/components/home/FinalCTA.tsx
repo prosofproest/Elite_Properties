@@ -30,14 +30,14 @@ export default function FinalCTA() {
           
           <div className="flex flex-wrap justify-center gap-6">
             <a
-              href="tel:+918884530510"
+              href="tel:+917304954717"
               className="bg-accent text-primary px-10 py-5 rounded-sm font-black uppercase tracking-widest text-xs hover:bg-white transition-all shadow-2xl flex items-center gap-3"
             >
               <Phone size={18} />
-              Call Now: +91 88845 30510
+              Call Now: +91 73049 54717
             </a>
             <a
-              href="https://wa.me/918884530510"
+              href="https://wa.me/917304954717"
               target="_blank"
               rel="noopener noreferrer"
               className="border-2 border-white text-white px-10 py-5 rounded-sm font-black uppercase tracking-widest text-xs hover:bg-white hover:text-primary transition-all flex items-center gap-3"

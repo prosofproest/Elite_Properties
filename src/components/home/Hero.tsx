@@ -39,7 +39,7 @@ export default function Hero() {
       setFormData({ name: '', phone: '', email: '', projectType: 'Residential', message: '' });
     } catch (error) {
       console.error('Lead submission error:', error);
-      setSubmitError('Submission failed. Call us: +918884530510');
+      setSubmitError('Submission failed. Call us: +917304954717');
     } finally {
       setIsSubmitting(false);
     }
@@ -131,7 +131,7 @@ export default function Hero() {
               </p>
               <div className="bg-gray-50 p-4 rounded-sm border border-gray-100">
                 <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-1">Direct Helpline</p>
-                <p className="text-primary font-black text-lg">+91 88845 30510</p>
+                <p className="text-primary font-black text-lg">+91 73049 54717</p>
               </div>
               <button 
                 onClick={() => setIsSuccess(false)}

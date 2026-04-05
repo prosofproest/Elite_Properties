@@ -40,8 +40,8 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="text-[10px] text-primary/50 font-bold uppercase tracking-widest mb-1">Call Us</p>
-                  <p className="font-bold text-primary text-lg">Phone: +91 88845 30510</p>
-                  <p className="text-xs text-primary/40">WhatsApp: wa.me/918884530510</p>
+                  <p className="font-bold text-primary text-lg">Phone: +91 73049 54717</p>
+                  <p className="text-xs text-primary/40">WhatsApp: wa.me/917304954717</p>
                 </div>
               </div>
 
@@ -101,7 +101,7 @@ export default function ContactPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <input required type="email" name="email" placeholder="your@email.com" className="border-b border-gray-200 py-3 text-sm focus:outline-none focus:border-accent" />
-                  <input required type="tel" name="phone" placeholder="+91 88845 30510" className="border-b border-gray-200 py-3 text-sm focus:outline-none focus:border-accent" />
+                  <input required type="tel" name="phone" placeholder="+91 73049 54717" className="border-b border-gray-200 py-3 text-sm focus:outline-none focus:border-accent" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <input required name="subject" placeholder="I'm interested in..." className="border-b border-gray-200 py-3 text-sm focus:outline-none focus:border-accent" />

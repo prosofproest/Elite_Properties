@@ -105,7 +105,7 @@ const ProjectDetailsPage: React.FC = () => {
 
   if (!project) return null;
 
-  const whatsappUrl = `https://wa.me/918884530510?text=${encodeURIComponent(`Hi, I'm interested in ${project.name}. Please share more details.`)}`;
+  const whatsappUrl = `https://wa.me/917304954717?text=${encodeURIComponent(`Hi, I'm interested in ${project.name}. Please share more details.`)}`;
 
   return (
     <div className="min-h-screen bg-white">
@@ -396,7 +396,7 @@ const ProjectDetailsPage: React.FC = () => {
       {/* Mobile Sticky Bottom Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 z-50 flex gap-4 shadow-[0_-10px_30px_rgba(0,0,0,0.1)]">
         <a 
-          href="tel:+918884530510" 
+          href="tel:+917304954717" 
           className="flex-1 bg-primary text-white py-4 rounded-sm font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2"
         >
           <Phone size={14} />

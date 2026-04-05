@@ -695,14 +695,14 @@ export default function LoanCalculatorPage() {
 
               <div className="flex flex-col gap-4 w-full lg:w-auto min-w-[300px]">
                 <a 
-                  href="tel:+918884530510"
+                  href="tel:+917304954717"
                   className="bg-accent text-primary py-5 px-8 rounded-sm font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-white transition-all shadow-xl"
                 >
                   <Phone size={18} />
-                  Call: +91 88845 30510
+                  Call: +91 73049 54717
                 </a>
                 <a 
-                  href="https://wa.me/918884530510?text=Hi, I need home loan help"
+                  href="https://wa.me/917304954717?text=Hi, I need home loan help"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-green-600 text-white py-5 px-8 rounded-sm font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-green-700 transition-all shadow-xl"

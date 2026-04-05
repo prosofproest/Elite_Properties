@@ -77,7 +77,7 @@ export default function LeadForm({ source, project, className }: LeadFormProps) 
       setTimeout(() => setIsSuccess(false), 5000);
     } catch (error) {
       console.error('Error submitting lead:', error);
-      toast.error('Submission failed. Call us: +918884530510');
+      toast.error('Submission failed. Call us: +917304954717');
     } finally {
       setIsSubmitting(false);
     }

@@ -383,7 +383,7 @@ export default function SearchPage() {
                           <ExternalLink size={13} /> View Project
                         </Link>
                         <a
-                          href={`https://wa.me/918884530510?text=Hi, I am interested in ${project.name}`}
+                          href={`https://wa.me/917304954717?text=Hi, I am interested in ${project.name}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center justify-center gap-1.5 bg-green-500 text-white px-4 py-2.5 rounded-sm hover:bg-green-600 transition-all"

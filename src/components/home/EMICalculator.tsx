@@ -178,7 +178,7 @@ export default function EMICalculator() {
 
             <div className="flex flex-col gap-4">
               <a
-                href="https://wa.me/918884530510"
+                href="https://wa.me/917304954717"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full bg-accent text-primary py-4 rounded-sm font-black uppercase tracking-widest text-xs hover:bg-white transition-all flex items-center justify-center gap-3"

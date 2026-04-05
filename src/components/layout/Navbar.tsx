@@ -77,11 +77,11 @@ export default function Navbar() {
         {/* Right Actions */}
         <div className="hidden md:flex items-center gap-6">
           <a
-            href="tel:+918884530510"
+            href="tel:+917304954717"
             className="flex items-center gap-2 text-sm font-bold text-primary transition-colors"
           >
             <Phone size={16} className="text-accent" />
-            +91 88845 30510
+            +91 73049 54717
           </a>
           <button 
             onClick={() => openBookingModal()}
@@ -139,9 +139,9 @@ export default function Navbar() {
             </div>
 
             <div className="mt-auto pt-10 border-t border-white/10 flex flex-col gap-6">
-              <a href="tel:+918884530510" className="text-accent text-xl font-bold flex items-center gap-3">
+              <a href="tel:+917304954717" className="text-accent text-xl font-bold flex items-center gap-3">
                 <Phone size={24} />
-                +91 88845 30510
+                +91 73049 54717
               </a>
               <button 
                 onClick={() => {
