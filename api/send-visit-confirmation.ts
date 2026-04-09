@@ -51,7 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Email to admin
     await resend.emails.send({
       from: 'Elite Properties <onboarding@resend.dev>',
-      to: ['hruthwick701@gmail.com'],
+      to: ['theeliteproperties1@gmail.com'],
       subject: `New Site Visit: ${name} — ${visitDate} at ${timeSlot}`,
       html: `
         <p>New site visit booked!</p>

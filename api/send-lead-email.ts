@@ -13,7 +13,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     await resend.emails.send({
       from: 'Elite Properties <onboarding@resend.dev>',
-      to: ['hruthwick701@gmail.com'],
+      to: ['theeliteproperties1@gmail.com'],
       subject: `New Lead: ${name} — ${projectInterest || 'General Enquiry'}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
