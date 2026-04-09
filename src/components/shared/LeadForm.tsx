@@ -60,15 +60,22 @@ export default function LeadForm({ source, project, className }: LeadFormProps) 
         referralCode: refCode,
       });
 
-      // Send automated email
       try {
         await fetch('/api/send-lead-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...data, source, id: leadId })
+          body: JSON.stringify({
+            name: data.name,
+            phone: data.phone,
+            email: data.email,
+            projectInterest: data.projectInterest || '',
+            budgetRange: data.budgetRange || '',
+            message: data.message || '',
+          })
         });
-      } catch (emailErr) {
-        console.error('Failed to send email:', emailErr);
+      } catch (emailError) {
+        console.error('Email notification failed:', emailError);
+        // Don't block lead save if email fails
       }
 
       setIsSuccess(true);

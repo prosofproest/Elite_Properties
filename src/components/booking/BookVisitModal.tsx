@@ -164,15 +164,22 @@ export default function BookVisitModal({ isOpen, onClose, initialProjectId }: Bo
       
       await createSiteVisit(visitData);
       
-      // Trigger Email via API
       try {
         await fetch('/api/send-visit-confirmation', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(visitData)
+          body: JSON.stringify({
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.email,
+            projectName: formData.projectName || '',
+            visitDate: formData.visitDate,
+            timeSlot: formData.timeSlot,
+            referenceNumber: refNum,
+          })
         });
-      } catch (emailErr) {
-        console.error('Failed to send email:', emailErr);
+      } catch (emailError) {
+        console.error('Visit email failed:', emailError);
       }
 
       setFormData(prev => ({ ...prev, referenceNumber: refNum }));
