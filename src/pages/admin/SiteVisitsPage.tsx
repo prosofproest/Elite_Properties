@@ -45,15 +45,8 @@ const SiteVisitsPage: React.FC = () => {
   const [sendingReminder, setSendingReminder] = useState<string | null>(null);
 
   useEffect(() => {
-    let q = query(collection(db, 'siteVisits'), orderBy('visitDate', 'desc'));
-    
-    if (statusFilter !== 'All') {
-      q = query(
-        collection(db, 'siteVisits'), 
-        where('status', '==', statusFilter),
-        orderBy('visitDate', 'desc')
-      );
-    }
+    // Bug 1: Simplified query to avoid index error
+    const q = query(collection(db, 'siteVisits'), orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const visitsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SiteVisit));
@@ -64,9 +57,12 @@ const SiteVisitsPage: React.FC = () => {
     });
 
     return () => unsubscribe();
-  }, [statusFilter]);
+  }, []); // Status filter is now handled client-side
 
-  const filteredVisits = visits.filter(v => statusFilter === 'All' || v.status === statusFilter);
+  const filteredVisits = visits.filter(v => 
+    statusFilter === 'All' || 
+    v.status?.toLowerCase() === statusFilter.toLowerCase()
+  );
 
   const handleStatusUpdate = async (id: string, newStatus: SiteVisit['status']) => {
     try {
@@ -78,29 +74,47 @@ const SiteVisitsPage: React.FC = () => {
     }
   };
 
-  const sendReminder = async (visit: SiteVisit) => {
-    setSendingReminder(visit.id);
+  const handleSendReminder = async (visit: SiteVisit) => {
     try {
-      const response = await fetch('/api/send-reminder-email', {
+      // Show loading state
+      toast.loading('Sending reminder...');
+      
+      const response = await fetch('/api/send-visit-reminder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: visit.name,
+          phone: visit.phone,
           email: visit.email,
-          projectName: visit.projectName,
+          projectName: visit.projectName || 'Elite Properties',
           visitDate: visit.visitDate,
-          timeSlot: visit.timeSlot
+          timeSlot: visit.timeSlot,
+          referenceNumber: visit.referenceNumber,
         })
       });
 
-      if (!response.ok) throw new Error('Failed to send reminder');
-      
-      toast.success(`Reminder sent to ${visit.name}`);
+      if (!response.ok) {
+        throw new Error('API not available');
+      }
+
+      toast.dismiss();
+      toast.success('Reminder sent successfully!');
     } catch (error) {
-      console.error('Reminder error:', error);
-      toast.error('Failed to send reminder');
-    } finally {
-      setSendingReminder(null);
+      toast.dismiss();
+      // Fallback: Open WhatsApp with reminder message
+      const message = encodeURIComponent(
+        `Hi ${visit.name}! This is a reminder for your site visit at Elite Properties.\n\n` +
+        `📅 Date: ${visit.visitDate}\n` +
+        `⏰ Time: ${visit.timeSlot}\n` +
+        `🏢 Project: ${visit.projectName || 'Elite Properties'}\n` +
+        `📍 Address: Elite Properties Office, Mumbai\n\n` +
+        `Please bring: Aadhaar, PAN Card, Bank Statement\n\n` +
+        `For queries: +91 73049 54717`
+      );
+      const phone = visit.phone?.replace(/\D/g, '');
+      const whatsappUrl = `https://wa.me/91${phone}?text=${message}`;
+      window.open(whatsappUrl, '_blank');
+      toast.success('Opening WhatsApp reminder!');
     }
   };
 
@@ -260,11 +274,10 @@ const SiteVisitsPage: React.FC = () => {
                   </td>
                   <td className="px-8 py-5 text-right">
                     <button 
-                      onClick={() => sendReminder(visit)}
-                      disabled={sendingReminder === visit.id}
-                      className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-sm text-[8px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all disabled:opacity-50"
+                      onClick={() => handleSendReminder(visit)}
+                      className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-sm text-[8px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-md active:scale-95"
                     >
-                      {sendingReminder === visit.id ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                      <Send size={12} />
                       Send Reminder
                     </button>
                   </td>

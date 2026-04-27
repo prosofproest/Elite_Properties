@@ -4,8 +4,12 @@
  */
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, User, browserSessionPersistence, setPersistence } from 'firebase/auth';
 import { auth } from './firebase';
+
+// Set persistence to session only
+setPersistence(auth, browserSessionPersistence)
+  .catch(console.error);
 
 interface AuthContextType {
   user: User | null;

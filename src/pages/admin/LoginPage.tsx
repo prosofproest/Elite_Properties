@@ -7,6 +7,8 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
+import { signOut } from 'firebase/auth';
+import { useEffect } from 'react';
 import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -19,6 +21,12 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/admin/dashboard';
+
+  useEffect(() => {
+    // Sign out any existing session when login page loads
+    // This forces re-authentication every time
+    signOut(auth).catch(console.error);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
