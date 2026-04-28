@@ -29,10 +29,7 @@ import {
   updateDoc, 
   doc, 
   deleteDoc,
-  Timestamp,
-  where,
-  startAt,
-  endAt
+  Timestamp
 } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { handleFirestoreError, OperationType } from '../../lib/firestore';
@@ -59,29 +56,29 @@ const LeadsPage: React.FC = () => {
   const leadIdFromUrl = searchParams.get('id');
 
   useEffect(() => {
-    let q = query(collection(db, 'leads'), orderBy('createdAt', 'desc'));
-    
-    if (dateRange !== 'All') {
-      const now = new Date();
-      let startDate = startOfDay(now);
-      
-      if (dateRange === 'Today') startDate = startOfDay(now);
-      else if (dateRange === 'Yesterday') startDate = startOfDay(subDays(now, 1));
-      else if (dateRange === 'Last 7 Days') startDate = startOfDay(subDays(now, 7));
-      else if (dateRange === 'Last 30 Days') startDate = startOfDay(subDays(now, 30));
-      
-      const endDate = dateRange === 'Yesterday' ? endOfDay(subDays(now, 1)) : endOfDay(now);
-      
-      q = query(
-        collection(db, 'leads'), 
-        where('createdAt', '>=', Timestamp.fromDate(startDate)),
-        where('createdAt', '<=', Timestamp.fromDate(endDate)),
-        orderBy('createdAt', 'desc')
-      );
-    }
+    const q = query(collection(db, 'leads'), orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const leadsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead));
+      let leadsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead));
+
+      if (dateRange !== 'All') {
+        const now = new Date();
+        let startDate = startOfDay(now);
+        
+        if (dateRange === 'Today') startDate = startOfDay(now);
+        else if (dateRange === 'Yesterday') startDate = startOfDay(subDays(now, 1));
+        else if (dateRange === 'Last 7 Days') startDate = startOfDay(subDays(now, 7));
+        else if (dateRange === 'Last 30 Days') startDate = startOfDay(subDays(now, 30));
+        
+        const endDate = dateRange === 'Yesterday' ? endOfDay(subDays(now, 1)) : endOfDay(now);
+        
+        leadsData = leadsData.filter(lead => {
+          if (!lead.createdAt) return false;
+          const leadDate = lead.createdAt.toDate();
+          return leadDate >= startDate && leadDate <= endDate;
+        });
+      }
+
       setLeads(leadsData);
       setLoading(false);
 

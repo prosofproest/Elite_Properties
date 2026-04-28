@@ -21,8 +21,8 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  doc,
   serverTimestamp,
-  where,
 } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { handleFirestoreError, OperationType } from '../../lib/firestore';
@@ -59,18 +59,24 @@ const GalleryPage: React.FC = () => {
   const [title, setTitle] = useState('');
 
   useEffect(() => {
-    let q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'));
-
-    if (categoryFilter !== 'All') {
-      q = query(
-        collection(db, 'gallery'),
-        where('category', '==', categoryFilter),
-        orderBy('createdAt', 'desc')
-      );
-    }
+    const q = query(
+      collection(db, 'gallery'), 
+      orderBy('createdAt', 'desc')
+    );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const galleryData = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as GalleryItem));
+      let galleryData = snapshot.docs.map(d => ({ 
+        id: d.id, 
+        ...d.data() 
+      } as GalleryItem));
+
+      if (categoryFilter !== 'All') {
+        galleryData = galleryData.filter(item => 
+          item.category === categoryFilter || 
+          item.eventName === categoryFilter
+        );
+      }
+
       setItems(galleryData);
       setLoading(false);
     }, (error) => {
