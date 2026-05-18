@@ -13,4 +13,4 @@ Real estate management platform.
 - MongoDB
 
 ## Author
-Hruthwick
+Hruthwick T N 
